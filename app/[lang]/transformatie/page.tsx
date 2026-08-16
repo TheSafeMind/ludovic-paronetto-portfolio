@@ -3,6 +3,7 @@ import { ButtonLink } from "@/components/ButtonLink";
 import { PageReveal, Reveal } from "@/components/Reveal";
 import { SonarBackground } from "@/components/SonarBackground";
 import { getDictionary, isLanguage } from "@/lib/i18n";
+import { localizedPath } from "@/lib/paths";
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   if (!isLanguage(params.lang)) return {};
@@ -50,7 +51,7 @@ export default function TransformationPage({ params }: { params: { lang: string 
         </section>
 
         <section className="cta-section section-space page-shell">
-          <Reveal><h2>{copy.ctaTitle}</h2><ButtonLink href={`/${params.lang}/contact`}>{copy.cta}</ButtonLink></Reveal>
+          <Reveal><h2>{copy.ctaTitle}</h2><ButtonLink href={localizedPath(params.lang, "contact")}>{copy.cta}</ButtonLink></Reveal>
         </section>
       </main>
     </PageReveal>

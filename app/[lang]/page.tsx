@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ButtonLink } from "@/components/ButtonLink";
 import { PageReveal, Reveal } from "@/components/Reveal";
 import { getDictionary, isLanguage } from "@/lib/i18n";
+import { localizedPath, resolveHref } from "@/lib/paths";
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   if (!isLanguage(params.lang)) return {};
@@ -35,8 +36,8 @@ export default function HomePage({ params }: { params: { lang: string } }) {
             <div className="hero-bottom">
               <p>{home.intro}</p>
               <div className="hero-actions">
-                <ButtonLink href={`/${params.lang}/diensten`}>{home.primaryCta}</ButtonLink>
-                <ButtonLink href={`/${params.lang}/contact`} variant="ghost">{home.secondaryCta}</ButtonLink>
+                <ButtonLink href={localizedPath(params.lang, "diensten")}>{home.primaryCta}</ButtonLink>
+                <ButtonLink href={localizedPath(params.lang, "contact")} variant="ghost">{home.secondaryCta}</ButtonLink>
               </div>
             </div>
             <div className="scroll-cue"><span /><small>{home.scroll}</small></div>
@@ -51,7 +52,7 @@ export default function HomePage({ params }: { params: { lang: string } }) {
           <div className="path-grid">
             {home.cards.map((card, index) => {
               const isExternal = "external" in card && card.external;
-              const href = isExternal ? card.href : `/${params.lang}/${card.href}`;
+              const href = isExternal ? card.href : resolveHref(params.lang, card.href);
               const content = (
                 <>
                   <div className="path-card-top"><span>{card.number}</span><i aria-hidden="true">↗</i></div>
@@ -75,7 +76,7 @@ export default function HomePage({ params }: { params: { lang: string } }) {
               <p className="eyebrow"><span />{home.signal}</p>
               <h2>{home.signalTitle}</h2>
               <p>{home.signalText}</p>
-              <Link href={`/${params.lang}/over-mij`}>{home.signalLink}<span>→</span></Link>
+              <Link href={localizedPath(params.lang, "over-mij")}>{home.signalLink}<span>→</span></Link>
             </div>
           </Reveal>
         </section>
@@ -84,7 +85,7 @@ export default function HomePage({ params }: { params: { lang: string } }) {
           <Reveal>
             <p className="mission-line">{dictionary.common.mission}</p>
             <h2>{home.closing}</h2>
-            <ButtonLink href={`/${params.lang}/contact`}>{home.closingCta}</ButtonLink>
+            <ButtonLink href={localizedPath(params.lang, "contact")}>{home.closingCta}</ButtonLink>
           </Reveal>
         </section>
       </main>

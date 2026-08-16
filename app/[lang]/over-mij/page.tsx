@@ -4,6 +4,7 @@ import { ButtonLink } from "@/components/ButtonLink";
 import { PageReveal, Reveal } from "@/components/Reveal";
 import { SonarBackground } from "@/components/SonarBackground";
 import { getDictionary, isLanguage, links } from "@/lib/i18n";
+import { localizedPath } from "@/lib/paths";
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   if (!isLanguage(params.lang)) return {};
@@ -55,7 +56,7 @@ export default function AboutPage({ params }: { params: { lang: string } }) {
         <section className="private-story section-space page-shell">
           <Reveal className="private-panel">
             <div><p className="section-index">03 / CONTEXT</p><h2>{copy.privateTitle}</h2></div>
-            <div><p>{copy.privateText}</p><ButtonLink href={`/${params.lang}/boek`} variant="ghost">{copy.privateCta}</ButtonLink></div>
+            <div><p>{copy.privateText}</p><ButtonLink href={localizedPath(params.lang, "boek")} variant="ghost">{copy.privateCta}</ButtonLink></div>
           </Reveal>
         </section>
       </main>

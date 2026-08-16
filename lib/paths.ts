@@ -1,0 +1,62 @@
+import type { Language } from "@/lib/i18n";
+import { isLanguage } from "@/lib/i18n";
+
+/**
+ * Canonical page keys are the Dutch slugs used by the file-system routes
+ * under app/[lang]/<slug>/page.tsx. Each language exposes a localized public
+ * slug that is rewritten to the canonical route by next.config rewrites.
+ */
+export type PageKey = "over-mij" | "boek" | "diensten" | "spreken" | "transformatie" | "contact";
+
+export const pageSlugs: Record<Language, Record<PageKey, string>> = {
+  nl: {
+    "over-mij": "over-mij",
+    boek: "boek",
+    diensten: "diensten",
+    spreken: "spreken",
+    transformatie: "transformatie",
+    contact: "contact",
+  },
+  en: {
+    "over-mij": "about",
+    boek: "book",
+    diensten: "services",
+    spreken: "speaking",
+    transformatie: "transformation",
+    contact: "contact",
+  },
+  fr: {
+    "over-mij": "a-propos",
+    boek: "livre",
+    diensten: "services",
+    spreken: "conferences",
+    transformatie: "transformation",
+    contact: "contact",
+  },
+};
+
+export const canonicalKeys = Object.keys(pageSlugs.nl) as PageKey[];
+
+function coerceLang(lang: string): Language {
+  return isLanguage(lang) ? lang : "nl";
+}
+
+/** Build a public URL for a given language + canonical page key. */
+export function localizedPath(lang: string, key: PageKey): string {
+  const safeLang = coerceLang(lang);
+  const slug = pageSlugs[safeLang]?.[key] ?? key;
+  return `/${safeLang}/${slug}`;
+}
+
+/**
+ * If a value is a canonical PageKey, return the localized href for the given
+ * language. Otherwise (external URL, non-page path) return the value untouched.
+ */
+export function resolveHref(lang: string, value: string): string {
+  if (!value) return value;
+  if (/^(https?:|mailto:|tel:|#|\/)/.test(value)) return value;
+  if ((canonicalKeys as string[]).includes(value)) {
+    return localizedPath(lang, value as PageKey);
+  }
+  return value;
+}
