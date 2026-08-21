@@ -5,21 +5,27 @@ import { PageReveal, Reveal } from "@/components/Reveal";
 import { SonarBackground } from "@/components/SonarBackground";
 import { getDictionary, isLanguage, links } from "@/lib/i18n";
 import { localizedPath } from "@/lib/paths";
+import { buildPageMetadata, type LanguagePageProps } from "@/lib/site";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
-  if (!isLanguage(params.lang)) return {};
-  const copy = getDictionary(params.lang).about;
-  return { title: copy.eyebrow, description: copy.intro, openGraph: { title: copy.title, description: copy.intro, images: [] }, twitter: { title: copy.title, description: copy.intro, images: [] } };
+export async function generateMetadata({ params }: LanguagePageProps): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return {};
+  const copy = getDictionary(lang).about;
+  return buildPageMetadata({ lang, slug: "over-mij", title: copy.eyebrow, description: copy.intro });
 }
 
-export default function AboutPage({ params }: { params: { lang: string } }) {
-  if (!isLanguage(params.lang)) return null;
-  const dictionary = getDictionary(params.lang);
+export default async function AboutPage({ params }: LanguagePageProps) {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return null;
+  const dictionary = getDictionary(lang);
   const copy = dictionary.about;
+  const quoteTailStart = copy.quote.lastIndexOf(" ");
+  const quoteLead = quoteTailStart >= 0 ? copy.quote.slice(0, quoteTailStart + 1) : "";
+  const quoteTail = quoteTailStart >= 0 ? copy.quote.slice(quoteTailStart + 1) : copy.quote;
 
   return (
     <PageReveal>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="inner-hero">
           <SonarBackground compact />
           <div className="page-shell inner-hero-content">
@@ -30,7 +36,10 @@ export default function AboutPage({ params }: { params: { lang: string } }) {
         </section>
 
         <section className="about-story section-space page-shell">
-          <Reveal className="pull-quote"><span>“</span><p>{copy.quote}</p></Reveal>
+          <Reveal className="pull-quote">
+            <span aria-hidden="true" className="pull-quote-mark">“</span>
+            <p>{quoteLead}<span className="pull-quote-tail">{quoteTail}<span aria-hidden="true" className="pull-quote-mark pull-quote-close">”</span></span></p>
+          </Reveal>
           <div className="story-grid">
             <Reveal><p className="section-index">01 / ORIGIN</p><h2>{copy.storyTitle}</h2></Reveal>
             <div className="story-copy">
@@ -56,7 +65,7 @@ export default function AboutPage({ params }: { params: { lang: string } }) {
         <section className="private-story section-space page-shell">
           <Reveal className="private-panel">
             <div><p className="section-index">03 / CONTEXT</p><h2>{copy.privateTitle}</h2></div>
-            <div><p>{copy.privateText}</p><ButtonLink href={localizedPath(params.lang, "boek")} variant="ghost">{copy.privateCta}</ButtonLink></div>
+            <div><p>{copy.privateText}</p><ButtonLink href={localizedPath(lang, "boek")} variant="ghost">{copy.privateCta}</ButtonLink></div>
           </Reveal>
         </section>
       </main>

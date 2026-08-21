@@ -6,7 +6,15 @@ import { isLanguage } from "@/lib/i18n";
  * under app/[lang]/<slug>/page.tsx. Each language exposes a localized public
  * slug that is rewritten to the canonical route by next.config rewrites.
  */
-export type PageKey = "over-mij" | "boek" | "diensten" | "spreken" | "transformatie" | "contact";
+export type PageKey =
+  | "over-mij"
+  | "boek"
+  | "diensten"
+  | "spreken"
+  | "transformatie"
+  | "contact"
+  | "privacy"
+  | "cookies";
 
 export const pageSlugs: Record<Language, Record<PageKey, string>> = {
   nl: {
@@ -16,6 +24,8 @@ export const pageSlugs: Record<Language, Record<PageKey, string>> = {
     spreken: "spreken",
     transformatie: "transformatie",
     contact: "contact",
+    privacy: "privacy",
+    cookies: "cookies",
   },
   en: {
     "over-mij": "about",
@@ -24,6 +34,8 @@ export const pageSlugs: Record<Language, Record<PageKey, string>> = {
     spreken: "speaking",
     transformatie: "transformation",
     contact: "contact",
+    privacy: "privacy",
+    cookies: "cookies",
   },
   fr: {
     "over-mij": "a-propos",
@@ -32,6 +44,8 @@ export const pageSlugs: Record<Language, Record<PageKey, string>> = {
     spreken: "conferences",
     transformatie: "transformation",
     contact: "contact",
+    privacy: "confidentialite",
+    cookies: "cookies",
   },
 };
 
@@ -46,6 +60,12 @@ export function localizedPath(lang: string, key: PageKey): string {
   const safeLang = coerceLang(lang);
   const slug = pageSlugs[safeLang]?.[key] ?? key;
   return `/${safeLang}/${slug}`;
+}
+
+/** Return the localized public slug (without lang prefix) for a canonical key. */
+export function localizedSlug(lang: string, key: PageKey): string {
+  const safeLang = coerceLang(lang);
+  return pageSlugs[safeLang]?.[key] ?? key;
 }
 
 /**

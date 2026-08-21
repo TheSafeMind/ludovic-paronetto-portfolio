@@ -1,31 +1,31 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ButtonLink";
+import { EnergyField } from "@/components/EnergyField";
 import { PageReveal, Reveal } from "@/components/Reveal";
 import { getDictionary, isLanguage } from "@/lib/i18n";
 import { localizedPath, resolveHref } from "@/lib/paths";
+import { buildPageMetadata, homeMetadataTitles, socialImagePath, type LanguagePageProps } from "@/lib/site";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
-  if (!isLanguage(params.lang)) return {};
-  const dictionary = getDictionary(params.lang);
-  return {
-    title: "Home",
-    description: dictionary.home.intro,
-    openGraph: { title: "Ludovic Paronetto", description: dictionary.home.intro, images: ["/og-sonar-midnight-v2.png"] },
-    twitter: { title: "Ludovic Paronetto", description: dictionary.home.intro, images: ["/og-sonar-midnight-v2.png"] },
-  };
+export async function generateMetadata({ params }: LanguagePageProps): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return {};
+  const dictionary = getDictionary(lang);
+  return buildPageMetadata({ lang, title: homeMetadataTitles[lang], description: dictionary.home.intro, image: socialImagePath, imageAlt: "Ludovic Paronetto — Sonar Midnight" });
 }
 
-export default function HomePage({ params }: { params: { lang: string } }) {
-  if (!isLanguage(params.lang)) return null;
-  const dictionary = getDictionary(params.lang);
+export default async function HomePage({ params }: LanguagePageProps) {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return null;
+  const dictionary = getDictionary(lang);
   const home = dictionary.home;
 
   return (
     <PageReveal>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="home-hero">
           <div className="hero-art" aria-hidden="true" />
+          <EnergyField />
           <div className="hero-content page-shell">
             <p className="eyebrow"><span />{home.eyebrow}</p>
             <h1>
@@ -36,8 +36,8 @@ export default function HomePage({ params }: { params: { lang: string } }) {
             <div className="hero-bottom">
               <p>{home.intro}</p>
               <div className="hero-actions">
-                <ButtonLink href={localizedPath(params.lang, "diensten")}>{home.primaryCta}</ButtonLink>
-                <ButtonLink href={localizedPath(params.lang, "contact")} variant="ghost">{home.secondaryCta}</ButtonLink>
+                <ButtonLink href={localizedPath(lang, "diensten")}>{home.primaryCta}</ButtonLink>
+                <ButtonLink href={localizedPath(lang, "contact")} variant="ghost">{home.secondaryCta}</ButtonLink>
               </div>
             </div>
             <div className="scroll-cue"><span /><small>{home.scroll}</small></div>
@@ -52,7 +52,7 @@ export default function HomePage({ params }: { params: { lang: string } }) {
           <div className="path-grid">
             {home.cards.map((card, index) => {
               const isExternal = "external" in card && card.external;
-              const href = isExternal ? card.href : resolveHref(params.lang, card.href);
+              const href = isExternal ? card.href : resolveHref(lang, card.href);
               const content = (
                 <>
                   <div className="path-card-top"><span>{card.number}</span><i aria-hidden="true">↗</i></div>
@@ -76,7 +76,7 @@ export default function HomePage({ params }: { params: { lang: string } }) {
               <p className="eyebrow"><span />{home.signal}</p>
               <h2>{home.signalTitle}</h2>
               <p>{home.signalText}</p>
-              <Link href={localizedPath(params.lang, "over-mij")}>{home.signalLink}<span>→</span></Link>
+              <Link href={localizedPath(lang, "over-mij")}>{home.signalLink}<span>→</span></Link>
             </div>
           </Reveal>
         </section>
@@ -85,7 +85,7 @@ export default function HomePage({ params }: { params: { lang: string } }) {
           <Reveal>
             <p className="mission-line">{dictionary.common.mission}</p>
             <h2>{home.closing}</h2>
-            <ButtonLink href={localizedPath(params.lang, "contact")}>{home.closingCta}</ButtonLink>
+            <ButtonLink href={localizedPath(lang, "contact")}>{home.closingCta}</ButtonLink>
           </Reveal>
         </section>
       </main>

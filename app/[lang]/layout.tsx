@@ -1,49 +1,70 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
+import "@fontsource-variable/inter";
+import "../globals.css";
+import { CookieNotice } from "@/components/CookieNotice";
 import { Footer } from "@/components/Footer";
-import { LanguageSetter } from "@/components/LanguageSetter";
 import { Navbar } from "@/components/Navbar";
 import { getDictionary, isLanguage, languages } from "@/lib/i18n";
+import { homeMetadataTitles, localizedAlternates, siteUrl, socialImagePath, absoluteUrl } from "@/lib/site";
+
+export const viewport: Viewport = {
+  colorScheme: "dark",
+  themeColor: "#0B0B0F",
+};
 
 export function generateStaticParams() {
   return languages.map((lang) => ({ lang }));
 }
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
-  if (!isLanguage(params.lang)) return {};
-  const dictionary = getDictionary(params.lang);
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return {};
+  const dictionary = getDictionary(lang);
   return {
+    metadataBase: siteUrl,
     title: {
-      default: "Ludovic Paronetto",
+      default: `${homeMetadataTitles[lang]} — Ludovic Paronetto`,
       template: "%s — Ludovic Paronetto",
     },
     description: dictionary.home.intro,
-    alternates: {
-      languages: {
-        nl: "/nl",
-        en: "/en",
-        fr: "/fr",
-      },
+    alternates: localizedAlternates(lang, ""),
+    openGraph: {
+      title: "Ludovic Paronetto",
+      description: dictionary.home.intro,
+      siteName: "Ludovic Paronetto",
+      type: "website",
+      images: [{ url: absoluteUrl(socialImagePath), alt: "Ludovic Paronetto — Sonar Midnight" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Ludovic Paronetto",
+      description: dictionary.home.intro,
+      images: [{ url: absoluteUrl(socialImagePath), alt: "Ludovic Paronetto — Sonar Midnight" }],
     },
   };
 }
 
-export default function LanguageLayout({
+export default async function LanguageLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }) {
-  if (!isLanguage(params.lang)) notFound();
-  const dictionary = getDictionary(params.lang);
+  const { lang } = await params;
+  if (!isLanguage(lang)) notFound();
+  const dictionary = getDictionary(lang);
 
   return (
-    <>
-      <LanguageSetter lang={params.lang} />
-      <Navbar lang={params.lang} dictionary={dictionary} />
-      {children}
-      <Footer lang={params.lang} dictionary={dictionary} />
-    </>
+    <html lang={lang}>
+      <body>
+        <a className="skip-link" href="#main-content">{lang === "nl" ? "Ga naar de inhoud" : lang === "fr" ? "Aller au contenu" : "Skip to content"}</a>
+        <Navbar lang={lang} dictionary={dictionary} />
+        {children}
+        <Footer lang={lang} dictionary={dictionary} />
+        <CookieNotice lang={lang} />
+      </body>
+    </html>
   );
 }

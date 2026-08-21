@@ -3,20 +3,23 @@ import { ButtonLink } from "@/components/ButtonLink";
 import { PageReveal, Reveal } from "@/components/Reveal";
 import { SonarBackground } from "@/components/SonarBackground";
 import { getDictionary, isLanguage, links } from "@/lib/i18n";
+import { buildPageMetadata, type LanguagePageProps } from "@/lib/site";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
-  if (!isLanguage(params.lang)) return {};
-  const copy = getDictionary(params.lang).speaking;
-  return { title: copy.eyebrow, description: copy.intro, openGraph: { title: copy.title, description: copy.intro, images: [] }, twitter: { title: copy.title, description: copy.intro, images: [] } };
+export async function generateMetadata({ params }: LanguagePageProps): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return {};
+  const copy = getDictionary(lang).speaking;
+  return buildPageMetadata({ lang, slug: "spreken", title: copy.eyebrow, description: copy.intro });
 }
 
-export default function SpeakingPage({ params }: { params: { lang: string } }) {
-  if (!isLanguage(params.lang)) return null;
-  const copy = getDictionary(params.lang).speaking;
+export default async function SpeakingPage({ params }: LanguagePageProps) {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return null;
+  const copy = getDictionary(lang).speaking;
 
   return (
     <PageReveal>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="inner-hero speaking-hero">
           <SonarBackground compact />
           <div className="page-shell inner-hero-content">
