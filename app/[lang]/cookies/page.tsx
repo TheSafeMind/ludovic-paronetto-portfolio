@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PageReveal, Reveal } from "@/components/Reveal";
 import { isLanguage, links } from "@/lib/i18n";
 import { getLegalCopy } from "@/lib/legal";
+import { localizedPath } from "@/lib/paths";
 import { buildPageMetadata, type LanguagePageProps } from "@/lib/site";
 
 export async function generateMetadata({ params }: LanguagePageProps): Promise<Metadata> {
@@ -28,7 +29,7 @@ export default async function CookiePolicyPage({ params }: LanguagePageProps) {
             <p>{copy.intro}</p>
             <div className="legal-meta">
               <span>{legal.common.updated}</span>
-              <Link href={`/${lang}/privacy`}>{legal.common.privacyLabel}</Link>
+              <Link href={localizedPath(lang, "privacy")}>{legal.common.privacyLabel}</Link>
             </div>
           </div>
         </section>

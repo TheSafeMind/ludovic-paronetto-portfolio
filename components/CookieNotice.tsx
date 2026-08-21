@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Language } from "@/lib/i18n";
 import { getLegalCopy } from "@/lib/legal";
+import { localizedPath } from "@/lib/paths";
 
 const STORAGE_KEY = "lp_privacy_notice_v1";
 const STORAGE_VERSION = 1;
@@ -75,8 +76,8 @@ export function CookieNotice({ lang }: { lang: Language }) {
         <h2 id="cookie-notice-title">{legal.banner.title}</h2>
         <p id="cookie-notice-description">{legal.banner.text}</p>
         <div className="cookie-notice-links">
-          <Link href={`/${lang}/privacy`}>{legal.common.privacyLabel}</Link>
-          <Link href={`/${lang}/cookies`}>{legal.common.cookiesLabel}</Link>
+          <Link href={localizedPath(lang, "privacy")}>{legal.common.privacyLabel}</Link>
+          <Link href={localizedPath(lang, "cookies")}>{legal.common.cookiesLabel}</Link>
         </div>
       </div>
       <button type="button" className="cookie-acknowledge" onClick={acknowledge}>{legal.banner.acknowledge}<span aria-hidden="true">→</span></button>

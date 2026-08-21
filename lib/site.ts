@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Language } from "@/lib/i18n";
+import { pageSlugs as pageSlugMap, type PageKey } from "@/lib/paths";
 
 const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ludovicparonetto.com";
 
@@ -7,6 +8,8 @@ export const siteUrl = new URL(configuredSiteUrl);
 export const siteOrigin = siteUrl.origin;
 export const socialImagePath = "/og-sonar-midnight-v2.png";
 
+// Canonical Dutch-slug keys. These match the folder names under app/[lang]/.
+// Public URLs per language are looked up in pageSlugMap.
 export const pageSlugs = [
   "",
   "over-mij",
@@ -22,6 +25,11 @@ export const pageSlugs = [
 export type PageSlug = (typeof pageSlugs)[number];
 export type LanguagePageProps = { params: Promise<{ lang: string }> };
 
+function publicSlugFor(lang: Language, slug: PageSlug): string {
+  if (slug === "") return "";
+  return pageSlugMap[lang]?.[slug as PageKey] ?? slug;
+}
+
 const openGraphLocales: Record<Language, string> = {
   nl: "nl_BE",
   en: "en_US",
@@ -35,7 +43,8 @@ export const homeMetadataTitles: Record<Language, string> = {
 };
 
 export function localizedPath(lang: Language, slug: PageSlug = "") {
-  return `/${lang}${slug ? `/${slug}` : ""}`;
+  const publicSlug = publicSlugFor(lang, slug);
+  return `/${lang}${publicSlug ? `/${publicSlug}` : ""}`;
 }
 
 export function absoluteUrl(path: string) {

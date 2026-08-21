@@ -3,6 +3,7 @@ import { PrivacySettingsButton } from "@/components/CookieNotice";
 import type { Dictionary, Language } from "@/lib/i18n";
 import { links } from "@/lib/i18n";
 import { getLegalCopy } from "@/lib/legal";
+import { resolveHref } from "@/lib/paths";
 
 export function Footer({ lang, dictionary }: { lang: Language; dictionary: Dictionary }) {
   const legal = getLegalCopy(lang);
@@ -16,18 +17,18 @@ export function Footer({ lang, dictionary }: { lang: Language; dictionary: Dicti
         <div className="footer-links">
           <div>
             <span>{dictionary.common.footerNav}</span>
-            {dictionary.common.nav.map((item) => <Link key={item.href} href={`/${lang}/${item.href}`}>{item.label}</Link>)}
+            {dictionary.common.nav.map((item) => <Link key={item.href} href={resolveHref(lang, item.href)}>{item.label}</Link>)}
           </div>
           <div>
             <span>{dictionary.common.connect}</span>
-            <Link href={`/${lang}/contact`}>{dictionary.common.contact}</Link>
+            <Link href={resolveHref(lang, "contact")}>{dictionary.common.contact}</Link>
             <a href={links.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
             <a href={links.launchpad} target="_blank" rel="noreferrer">LP Cyber Launchpad</a>
           </div>
           <div>
             <span>{legal.common.legalLabel}</span>
-            <Link href={`/${lang}/privacy`}>{legal.common.privacyLabel}</Link>
-            <Link href={`/${lang}/cookies`}>{legal.common.cookiesLabel}</Link>
+            <Link href={resolveHref(lang, "privacy")}>{legal.common.privacyLabel}</Link>
+            <Link href={resolveHref(lang, "cookies")}>{legal.common.cookiesLabel}</Link>
             <PrivacySettingsButton label={legal.common.settingsLabel} />
           </div>
         </div>

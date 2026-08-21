@@ -6,6 +6,7 @@ import { PageReveal, Reveal } from "@/components/Reveal";
 import { SonarBackground } from "@/components/SonarBackground";
 import { StickyScanCta } from "@/components/StickyScanCta";
 import { getDictionary, isLanguage, links } from "@/lib/i18n";
+import { localizedPath } from "@/lib/paths";
 import { buildPageMetadata, type LanguagePageProps } from "@/lib/site";
 
 export async function generateMetadata({ params }: LanguagePageProps): Promise<Metadata> {
@@ -137,7 +138,7 @@ export default async function TransformationPage({ params }: LanguagePageProps) 
         <div className="page-shell proprietary-note"><span>™</span><p>{copy.proprietary}</p></div>
 
         <section className="cta-section section-space page-shell">
-          <Reveal><h2>{copy.ctaTitle}</h2><ButtonLink href={`/${lang}/contact`}>{copy.cta}</ButtonLink></Reveal>
+          <Reveal><h2>{copy.ctaTitle}</h2><ButtonLink href={localizedPath(lang, "contact")}>{copy.cta}</ButtonLink></Reveal>
         </section>
       </main>
       <StickyScanCta label={copy.stickyCta} />

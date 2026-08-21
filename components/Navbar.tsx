@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Dictionary, Language } from "@/lib/i18n";
 import { languages } from "@/lib/i18n";
+import { pageSlugs, resolveHref } from "@/lib/paths";
 
 const navigationLabels: Record<Language, { main: string; mobile: string; languages: string; home: string }> = {
   nl: { main: "Hoofdnavigatie", mobile: "Mobiele navigatie", languages: "Taalkeuze", home: "Ludovic Paronetto home" },
@@ -62,6 +63,18 @@ export function Navbar({ lang, dictionary }: { lang: Language; dictionary: Dicti
   const languageHref = (nextLang: Language) => {
     const parts = pathname.split("/");
     parts[1] = nextLang;
+    // Translate the current localized slug (parts[2]) to the equivalent slug
+    // in the target language, so /en/about becomes /nl/over-mij and vice versa.
+    if (parts[2]) {
+      const currentSlug = parts[2];
+      const currentMap = pageSlugs[lang];
+      const canonicalKey = (Object.keys(currentMap) as Array<keyof typeof currentMap>).find(
+        (key) => currentMap[key] === currentSlug,
+      );
+      if (canonicalKey) {
+        parts[2] = pageSlugs[nextLang][canonicalKey];
+      }
+    }
     return parts.join("/") || `/${nextLang}`;
   };
 
@@ -72,11 +85,14 @@ export function Navbar({ lang, dictionary }: { lang: Language; dictionary: Dicti
           LP<span>.</span>
         </Link>
         <nav className="desktop-nav" aria-label={labels.main}>
-          {dictionary.common.nav.map((item) => (
-            <Link key={item.href} className={pathname.includes(`/${item.href}`) ? "active" : ""} href={`/${lang}/${item.href}`}>
-              {item.label}
-            </Link>
-          ))}
+          {dictionary.common.nav.map((item) => {
+            const href = resolveHref(lang, item.href);
+            return (
+              <Link key={item.href} className={pathname === href || pathname.startsWith(`${href}/`) ? "active" : ""} href={href}>
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
         <div className="nav-actions">
           <div className="language-switcher" aria-label={labels.languages}>
@@ -86,7 +102,7 @@ export function Navbar({ lang, dictionary }: { lang: Language; dictionary: Dicti
               </Link>
             ))}
           </div>
-          <Link className="nav-contact" href={`/${lang}/contact`}>{dictionary.common.contact}<span>↗</span></Link>
+          <Link className="nav-contact" href={resolveHref(lang, "contact")}>{dictionary.common.contact}<span>↗</span></Link>
           <button ref={menuButtonRef} className="menu-button" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? dictionary.common.close : dictionary.common.menu}>
             <span>{open ? dictionary.common.close : dictionary.common.menu}</span>
             <i className={open ? "open" : ""}><b /><b /></i>
@@ -98,9 +114,9 @@ export function Navbar({ lang, dictionary }: { lang: Language; dictionary: Dicti
           <motion.div ref={mobileMenuRef} id="mobile-menu" className="mobile-menu" initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25 }}>
             <nav aria-label={labels.mobile}>
               {dictionary.common.nav.map((item, index) => (
-                <Link key={item.href} href={`/${lang}/${item.href}`} onClick={() => setOpen(false)}><span>0{index + 1}</span>{item.label}</Link>
+                <Link key={item.href} href={resolveHref(lang, item.href)} onClick={() => setOpen(false)}><span>0{index + 1}</span>{item.label}</Link>
               ))}
-              <Link href={`/${lang}/contact`} onClick={() => setOpen(false)}><span>05</span>{dictionary.common.contact}</Link>
+              <Link href={resolveHref(lang, "contact")} onClick={() => setOpen(false)}><span>05</span>{dictionary.common.contact}</Link>
             </nav>
             <div className="mobile-language-switcher" aria-label={labels.languages}>
               {languages.map((code) => (
