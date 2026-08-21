@@ -3,20 +3,26 @@ import Image from "next/image";
 import { ButtonLink } from "@/components/ButtonLink";
 import { PageReveal, Reveal } from "@/components/Reveal";
 import { getDictionary, isLanguage, links } from "@/lib/i18n";
+import { buildPageMetadata, type LanguagePageProps } from "@/lib/site";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
-  if (!isLanguage(params.lang)) return {};
-  const copy = getDictionary(params.lang).book;
-  return { title: copy.eyebrow, description: copy.intro, openGraph: { title: copy.title, description: copy.intro, images: [] }, twitter: { title: copy.title, description: copy.intro, images: [] } };
+export async function generateMetadata({ params }: LanguagePageProps): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return {};
+  const copy = getDictionary(lang).book;
+  return buildPageMetadata({ lang, slug: "boek", title: copy.title, description: copy.intro, image: "/book-cover.jpg", imageAlt: `${copy.title} — Ludovic Paronetto` });
 }
 
-export default function BookPage({ params }: { params: { lang: string } }) {
-  if (!isLanguage(params.lang)) return null;
-  const copy = getDictionary(params.lang).book;
+export default async function BookPage({ params }: LanguagePageProps) {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return null;
+  const copy = getDictionary(lang).book;
+  const quoteTailStart = copy.quote.lastIndexOf(" ");
+  const quoteLead = quoteTailStart >= 0 ? copy.quote.slice(0, quoteTailStart + 1) : "";
+  const quoteTail = quoteTailStart >= 0 ? copy.quote.slice(quoteTailStart + 1) : copy.quote;
 
   return (
     <PageReveal>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="book-hero page-shell">
           <Reveal className="book-hero-copy">
             <p className="eyebrow"><span />{copy.eyebrow}</p>
@@ -35,9 +41,13 @@ export default function BookPage({ params }: { params: { lang: string } }) {
         <section className="book-position section-space">
           <div className="page-shell">
             <Reveal className="book-statement">
-              <p>{copy.notHero}</p><p>{copy.notVictim}</p><h2>{copy.truth}</h2>
+              <p className="book-not-hero">{copy.notHero}</p><p className="book-not-victim">{copy.notVictim}</p><h2>{copy.truth}</h2>
             </Reveal>
-            <Reveal className="book-quote"><span>“</span><blockquote>{copy.quote}</blockquote><small>— Ludovic Paronetto</small></Reveal>
+            <Reveal className="book-quote">
+              <span aria-hidden="true" className="book-quote-open">“</span>
+              <blockquote>{quoteLead}<span className="book-quote-tail">{quoteTail}<span aria-hidden="true" className="book-quote-close">”</span></span></blockquote>
+              <small>— Ludovic Paronetto</small>
+            </Reveal>
           </div>
         </section>
 

@@ -2,16 +2,19 @@ import type { Metadata } from "next";
 import { PageReveal, Reveal } from "@/components/Reveal";
 import { SonarBackground } from "@/components/SonarBackground";
 import { getDictionary, isLanguage, links } from "@/lib/i18n";
+import { buildPageMetadata, type LanguagePageProps } from "@/lib/site";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
-  if (!isLanguage(params.lang)) return {};
-  const copy = getDictionary(params.lang).contact;
-  return { title: copy.eyebrow, description: copy.intro, openGraph: { title: copy.title, description: copy.intro, images: [] }, twitter: { title: copy.title, description: copy.intro, images: [] } };
+export async function generateMetadata({ params }: LanguagePageProps): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return {};
+  const copy = getDictionary(lang).contact;
+  return buildPageMetadata({ lang, slug: "contact", title: copy.eyebrow, description: copy.intro });
 }
 
-export default function ContactPage({ params }: { params: { lang: string } }) {
-  if (!isLanguage(params.lang)) return null;
-  const copy = getDictionary(params.lang).contact;
+export default async function ContactPage({ params }: LanguagePageProps) {
+  const { lang } = await params;
+  if (!isLanguage(lang)) return null;
+  const copy = getDictionary(lang).contact;
   const cards = [
     { number: "01", label: copy.bookingLabel, title: copy.bookingTitle, text: copy.bookingText, action: copy.bookingCta, href: links.calendar },
     { number: "02", label: copy.emailLabel, title: copy.emailTitle, text: copy.emailText, action: copy.emailCta, href: links.email },
@@ -20,7 +23,7 @@ export default function ContactPage({ params }: { params: { lang: string } }) {
 
   return (
     <PageReveal>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="contact-hero inner-hero">
           <SonarBackground />
           <div className="page-shell inner-hero-content"><p className="eyebrow"><span />{copy.eyebrow}</p><h1>{copy.title}</h1><p className="inner-intro">{copy.intro}</p></div>
